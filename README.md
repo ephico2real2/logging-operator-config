@@ -283,33 +283,59 @@ spec:
 
 ### Step 3: Update `values.schema.json` (If Used)
 
-If you're using a `values.schema.json` to validate your `values.yaml`, remember to add or update the schema to include `target_eks_clustername`.
+To add the `target_eks_clustername` to your JSON schema for `values.yaml` validation, you should introduce it as a new property at the root level of your schema object. This ensures that your schema correctly expects and validates the `target_eks_clustername` field alongside other top-level fields like `namespace`, `flow`, and `output`.
+
+Here's how you can add `target_eks_clustername` to your schema:
 
 ```json
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
   "properties": {
     "namespace": { "type": "string" },
-    "target_eks_clustername": { "type": "string" },
+    "target_eks_clustername": { "type": "string" },  // Added this line
+    "flow": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "labels": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["name", "labels"]
+    },
     "output": {
       "type": "object",
       "properties": {
+        "name": { "type": "string" },
         "cloudwatch": {
+          "type": "object",
           "properties": {
+            "log_group_name": { "type": "string" },
             "region": { "type": "string" },
             "auto_create_stream": { "type": "boolean" },
             "log_stream_name": { "type": "string" },
             "buffer": {
-              "type": "object"
-              // Include buffer properties here as before
+              "type": "object",
+              "properties": {
+                "timekey": { "type": "string" },
+                "timekey_wait": { "type": "string" },
+                "timekey_use_utc": { "type": "boolean" }
+              },
+              "required": ["timekey", "timekey_wait", "timekey_use_utc"]
             }
           },
-          "required": ["region", "auto_create_stream", "log_stream_name", "buffer"]
+          "required": ["log_group_name", "region", "auto_create_stream", "log_stream_name", "buffer"]
         }
-      }
+      },
+      "required": ["name", "cloudwatch"]
     }
   },
-  "required": ["namespace", "target_eks_clustername", "output"]
+  "required": ["namespace", "target_eks_clustername", "flow", "output"]
 }
 ```
+
+By adding `target_eks_clustername` as a required property, you're ensuring that anyone using your Helm chart will provide this value in their `values.yaml`, which is crucial for correctly setting up the logging configuration as designed. This update makes your `values.schema.json` accurately reflect the expected structure and required values of your `values.yaml`, enhancing the robustness and usability of your Helm chart.
 
 By making these adjustments, you're enabling the dynamic construction of the `log_group_name` based on the `target_eks_clustername` and `namespace` parameters, providing more flexibility and customization capabilities in your Helm chart. This approach ensures that your chart can be easily adapted to different environments or configurations without hardcoding specific values.
