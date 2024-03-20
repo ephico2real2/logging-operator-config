@@ -233,3 +233,83 @@ For more details on configuring logging flows and outputs, refer to the official
 - For issues related to log delivery to CloudWatch, ensure that your Kubernetes nodes or service accounts have the necessary IAM permissions.
 
 ```
+
+
+To further parameterize the `log_group_name` in your Helm chart to incorporate dynamic values for `target_eks_clustername` and `namespace`, you'll need to adjust your `values.yaml` file to include these new parameters and then modify the template to construct the `log_group_name` dynamically using these parameters.
+
+### Step 1: Update `values.yaml`
+
+Add the `target_eks_clustername` parameter to your `values.yaml`. You already have `namespace`, so ensure it's also used correctly in this context.
+
+```yaml
+# Additions to values.yaml
+namespace: project-1
+target_eks_clustername: test-cluster
+
+output:
+  name: cloudwatch
+  cloudwatch:
+    # Update the log_group_name to just be a placeholder or remove it since we'll construct it dynamically
+    region: us-west-2
+    auto_create_stream: true
+    log_stream_name: "${tag}"
+    buffer:
+      timekey: 30s
+      timekey_wait: 30s
+      timekey_use_utc: true
+```
+
+### Step 2: Update the Output Template
+
+Modify the `templates/output.yaml` to dynamically construct the `log_group_name` using the `target_eks_clustername` and `namespace`.
+
+```yaml
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+  name: {{ .Values.output.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  cloudwatch:
+    log_group_name: "/aws/eks/{{ .Values.target_eks_clustername }}/{{ .Values.namespace }}"
+    log_stream_name: {{ .Values.output.cloudwatch.log_stream_name }}
+    region: {{ .Values.output.cloudwatch.region }}
+    auto_create_stream: {{ .Values.output.cloudwatch.auto_create_stream }}
+    buffer:
+      timekey: {{ .Values.output.cloudwatch.buffer.timekey }}
+      timekey_wait: {{ .Values.output.cloudwatch.buffer.timekey_wait }}
+      timekey_use_utc: {{ .Values.output.cloudwatch.buffer.timekey_use_utc }}
+```
+
+### Step 3: Update `values.schema.json` (If Used)
+
+If you're using a `values.schema.json` to validate your `values.yaml`, remember to add or update the schema to include `target_eks_clustername`.
+
+```json
+{
+  "properties": {
+    "namespace": { "type": "string" },
+    "target_eks_clustername": { "type": "string" },
+    "output": {
+      "type": "object",
+      "properties": {
+        "cloudwatch": {
+          "properties": {
+            "region": { "type": "string" },
+            "auto_create_stream": { "type": "boolean" },
+            "log_stream_name": { "type": "string" },
+            "buffer": {
+              "type": "object"
+              // Include buffer properties here as before
+            }
+          },
+          "required": ["region", "auto_create_stream", "log_stream_name", "buffer"]
+        }
+      }
+    }
+  },
+  "required": ["namespace", "target_eks_clustername", "output"]
+}
+```
+
+By making these adjustments, you're enabling the dynamic construction of the `log_group_name` based on the `target_eks_clustername` and `namespace` parameters, providing more flexibility and customization capabilities in your Helm chart. This approach ensures that your chart can be easily adapted to different environments or configurations without hardcoding specific values.
