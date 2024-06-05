@@ -1,7 +1,8 @@
 namespace: project-1
 nameOverride: ""
-environmentName: production
+environmentName: dev
 region: us-east-1  # General region setting for all services
+targetClusterName: dev-cluster
 
 flow:
   baseName: flow
@@ -12,7 +13,6 @@ cloudwatch:
   enabled: true
   output:
     name: cloudwatch-output
-    log_group_name: /aws/eks/test-cluster/project-1
     log_stream_name: "${tag}"
     auto_create_stream: true
     buffer:

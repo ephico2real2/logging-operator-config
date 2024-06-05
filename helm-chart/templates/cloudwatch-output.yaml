@@ -8,7 +8,7 @@ metadata:
     {{- include "logging-config.labels" . | nindent 4 }}
 spec:
   cloudwatch:
-    log_group_name: {{ .Values.cloudwatch.output.log_group_name }}
+    log_group_name: {{ printf "/aws/eks/%s/%s" .Values.targetClusterName .Values.namespace }}
     log_stream_name: {{ .Values.cloudwatch.output.log_stream_name }}
     region: {{ .Values.region }}
     auto_create_stream: {{ .Values.cloudwatch.output.auto_create_stream }}
