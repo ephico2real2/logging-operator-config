@@ -27,10 +27,12 @@
         },
         "labels": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Labels to select for the Flow"
+          "properties": {
+            "app.kubernetes.io/type": {
+              "type": "string",
+              "description": "Labels to select for the Flow"
+            }
+          }
         }
       }
     },
@@ -96,9 +98,9 @@
           "type": "string",
           "description": "Secret store for Splunk HEC token"
         },
-        "refreshInterval": {
+        "secretName": {
           "type": "string",
-          "description": "Refresh interval for the Splunk external secret"
+          "description": "Name of the secret in the secret store"
         },
         "output": {
           "type": "object",
@@ -132,13 +134,5 @@
       }
     }
   },
-  "required": [
-    "namespace",
-    "environmentName",
-    "region",
-    "flow",
-    "cloudwatch",
-    "splunk"
-  ]
+  "required": ["namespace", "environmentName", "region", "flow", "cloudwatch", "splunk"]
 }
-
