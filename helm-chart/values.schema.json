@@ -14,13 +14,13 @@
       "type": "string",
       "description": "The environment name (e.g., production)"
     },
-    "targetClusterName": {
-      "type": "string",
-      "description": "The target eks or aks kuberneters cluster"
-    },
     "region": {
       "type": "string",
       "description": "The AWS region"
+    },
+    "targetClusterName": {
+      "type": "string",
+      "description": "The name of the target cluster"
     },
     "flow": {
       "type": "object",
@@ -104,6 +104,10 @@
           "type": "string",
           "description": "Refresh interval for the Splunk external secret"
         },
+        "secretName": {
+          "type": "string",
+          "description": "Name of the secret in the secret store"
+        },
         "output": {
           "type": "object",
           "properties": {
@@ -140,6 +144,7 @@
     "namespace",
     "environmentName",
     "region",
+    "targetClusterName",
     "flow",
     "cloudwatch",
     "splunk"
