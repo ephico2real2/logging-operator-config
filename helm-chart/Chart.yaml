@@ -4,3 +4,4 @@ description: A Helm chart for configuring logging operator with CloudWatch and S
 type: application
 version: 0.1.0
 appVersion: "1.0"
+icon: https://raw.githubusercontent.com/ephico2real2/logging-operator-config/main/images/logging-config.png
