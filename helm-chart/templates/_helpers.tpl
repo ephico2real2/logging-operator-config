@@ -22,7 +22,7 @@ Common labels
 {{- define "logging-config.labels" -}}
 app.kubernetes.io/name: {{ include "logging-config.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/version: {{ .Chart.AppVersion }}
+app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/type: {{ get .Values.flow.labels "app.kubernetes.io/type" }}
 {{- end }}
